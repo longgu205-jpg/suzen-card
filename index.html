@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>電子賀卡</title>
+
+<style>
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Microsoft JhengHei", sans-serif;
+}
+
+#cover, #player {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+#player {
+  display: none;
+}
+
+#message {
+  display: none;
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 3em;
+  line-height: 1.4;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+</style>
+</head>
+
+<body>
+
+<img id="cover" src="cover.jpg">
+<video id="player" playsinline webkit-playsinline></video>
+<audio id="bgm" src="bgm.mp3" loop></audio>
+
+<div id="message">
+  新的一年，<br>
+  也祝妳快樂。
+</div>
+
+<script>
+const videos = ["V1.mp4", "V2.mp4", "V3.mp4", "V4.mp4"];
+let index = 0;
+
+const cover = document.getElementById("cover");
+const player = document.getElementById("player");
+const bgm = document.getElementById("bgm");
+const message = document.getElementById("message");
+
+// 淡入
+function fadeIn(el) {
+  el.style.display = "block";
+  el.style.opacity = 0;
+  setTimeout(() => el.style.opacity = 1, 50);
+}
+
+// 淡出
+function fadeOut(el, callback) {
+  el.style.opacity = 0;
+  setTimeout(() => {
+    el.style.display = "none";
+    if (callback) callback();
+  }, 1000);
+}
+
+// 播下一支影片
+function playNext() {
+  if (index >= videos.length) {
+    // 所有影片播完 → 顯示祝福文字
+    message.style.display = "block";
+    setTimeout(() => message.style.opacity = 1, 50);
+
+    // 5 秒後結束（停 bgm，畫面停住）
+    setTimeout(() => {
+      bgm.pause();
+    }, 5000);
+
+    return;
+  }
+
+  player.src = videos[index];
+  fadeIn(player);
+  player.play();
+  index++;
+}
+
+// 點封面開始
+cover.addEventListener("click", () => {
+  cover.style.display = "none";
+  bgm.volume = 0.6;
+  bgm.play();
+  playNext();
+});
+
+// 每支影片播完
+player.addEventListener("ended", () => {
+  fadeOut(player, playNext);
+});
+</script>
+
+</body>
+</html>
